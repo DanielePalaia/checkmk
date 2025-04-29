@@ -1,62 +1,59 @@
 # Install on first K8s cluster
-
-resource "helm_release" "rabbitmq" {
+resource "helm_release" "rabbitmq-cluster-1" {
   provider   = helm.cluster_1
-  name       = "rabbitmq"
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "rabbitmq"
-  version    = "12.0.1"
-  namespace  = "rabbitmq"
-  create_namespace = true
-
-  set {
-    name  = "service.type"
-    value = "LoadBalancer"
-  }
-
-  # Credentials 
-  set {
-    name  = "auth.username"
-    value = "admin"
-  }
-  set {
-    name  = "auth.password"
-    value = "password123"
-  }
-
-  set {
-    name  = "service.ports.manager"
-    value = "15672"  # RabbitMQ UI port
-  }
+  name             = local.common_config.name
+  repository       = local.common_config.repository
+  chart            = local.common_config.chart
+  version          = local.common_config.version
+  namespace        = local.common_config.namespace
+  create_namespace = local.common_config.create_namespace
 
   wait = true
+
+  # Apply common sets
+  dynamic "set" {
+    for_each = local.common_config.sets
+    content {
+      name  = set.key
+      value = set.value
+    }
+  }
+  
+  # Apply cluster-specific sets
+  dynamic "set" {
+    for_each = local.cluster_1_config.sets
+    content {
+      name  = set.key
+      value = set.value
+    }
+  }
 }
 
 # Install on second K8s cluster
-#resource "helm_release" "rabbitmq" {
-#  provider   = helm.cluster_2
-#  name       = "rabbitmq"
-#  repository = "https://charts.bitnami.com/bitnami"
-#  chart      = "rabbitmq"
-#  version    = "12.0.1"
-#  namespace  = "rabbitmq"
-#  create_namespace = true
+resource "helm_release" "rabbitmq-cluster-2" {
+  provider   = helm.cluster_2
+  name             = local.common_config.name
+  repository       = local.common_config.repository
+  chart            = local.common_config.chart
+  version          = local.common_config.version
+  namespace        = local.common_config.namespace
+  create_namespace = local.common_config.create_namespace
+  wait = true
 
-  # Force LoadBalancer for local access
-#  set {
-#    name  = "service.type"
-#    value = "LoadBalancer"
-#  }
-
-  # Credentials
-#  set {
-#    name  = "auth.username"
-#    value = "admin"
-#  }
-#  set {
-#    name  = "auth.password"
-#    value = "password123"
-#  }
-
-#  wait = true
-#}
+  dynamic "set" {
+    for_each = local.common_config.sets
+    content {
+      name  = set.key
+      value = set.value
+    }
+  }
+  
+  # Apply cluster-specific sets
+  dynamic "set" {
+    for_each = local.cluster_1_config.sets
+    content {
+      name  = set.key
+      value = set.value
+    }
+  }
+}
