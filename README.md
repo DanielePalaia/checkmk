@@ -27,7 +27,7 @@ kind create cluster --name rabbitmq-1
 kind create cluster --name rabbitmq-2
 ```
 
-We could also simulate a LoadBalancer using tools like MetaLB: https://metallb.io/ and configure it with Kind to have an external-ip
+We could also simulate a LoadBalancer using tools like MetaLB: https://metallb.io/ or another similar solution and configure it with Kind to have an external-ip
 but I'll leave it for this POC.
 
 ## Chart used
@@ -58,7 +58,10 @@ I would have liked to make the script more extensible, like write the names of t
 But because I don't know well Terraform or I hit some limitations I was taking too much time on this implementation and to be on the 3hours frame I decided to leave it for the moment.
 As every project if useful to have github action that on every PR and push on main run a deployment (for example on a kind cluster created inside a github vm) to validate for modifications. 
 
-It is also better to develop RabbitMQ clusters on K8s using the cluster operator: https://github.com/bitnami/charts/tree/main/bitnami/rabbitmq-cluster-operator
+It is also better to develop RabbitMQ clusters on K8s using the cluster operator: 
+
+https://github.com/bitnami/charts/tree/main/bitnami/rabbitmq-cluster-operator
+
 In this case the terraform script needs to take in consideration the installation of the operator and then of the RabbitMQ clusters
 
 ## How to test
