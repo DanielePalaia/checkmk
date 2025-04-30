@@ -22,10 +22,10 @@ we can just use a couple of local K8s clusters developed with Kind and expose th
 
 We can create a couple of K8s clusters locally with Kind in this way:
 
-'''
+```
 kind create cluster --name rabbitmq-1
 kind create cluster --name rabbitmq-2
-'''
+```
 
 We could also simulate a LoadBalancer using tools like MetaLB: https://metallb.io/ and configure it with Kind to have an external-ip
 but I'll leave it for this POC.
@@ -63,7 +63,7 @@ on variables.tf we can override some parameteres (for example the namespace of t
 
 on providers.tf there are the two helm provideres:
 
-'''
+```
 provider "helm" {
   alias = "cluster_1"
   kubernetes {
@@ -79,22 +79,22 @@ provider "helm" {
     config_context = "kind-rabbitmq-2"
   }
 }
-'''
+```
 you need to modify the config_name specified in your ~/.kube/config
 
 then you can:
 
-'''
+```
 terraform init
 terraform plan
 terraform apply
-'''
+```
 
 you can connect to a cluster and see if everything is up and running:
 
-'''
+```
 kubectl get all -n rabbitmq
-'''
+```
 
 
 ## Extension
