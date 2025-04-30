@@ -16,7 +16,8 @@ https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
 - we are interested in how you structure and document your POC
 
 ## Infrastructure used
-We could use a set of K8s clusters deployed on the Cloud like GKE to have automatic access to Load Balancer but given the simple usage of the POC 
+We could use a set of K8s clusters deployed on the Cloud like GKE to have automatic access to a Cloud Load Balancer to be able to have
+autmatic access from the internet with an external-ip but given the simple usage of the POC 
 we can just use a couple of local K8s clusters developed with Kind and expose the deployed service to be accessed locally.
 
 We can create a couple of K8s clusters locally with Kind in this way:
@@ -26,7 +27,7 @@ kind create cluster --name rabbitmq-1
 kind create cluster --name rabbitmq-2
 '''
 
-We could also simulate a LoadBalancer using tools like MetaLB: https://metallb.io/ and configure it with Kind
+We could also simulate a LoadBalancer using tools like MetaLB: https://metallb.io/ and configure it with Kind to have an external-ip
 but I'll leave it for this POC.
 
 ## Chart used
@@ -39,14 +40,66 @@ There are two charts of RabbitMQ offered:
 * RabbitMQ: https://github.com/bitnami/charts/tree/main/bitnami/rabbitmq
 
 While the first one is the suggested one to use from the RabbitMQ team (as it is using the official RabbitMQ cluster operator),
-I'll choose the second one as it more simple to install as it develop directly the RabbitMQ service without using the operator so there are not two components to manage.
-
+I'll choose the second one as it more simple to install as it deployes directly the RabbitMQ service without using the operator so there are not two different components to manage by the
+terraform script
 
 ## Terraform script
 
 The terraform script is composed by different files:
 
-* variables.tf: where there are 
+* variables.tf: where there are some parameters we can modify to install the RabbitMQ clusters on a K8s cluster like the image, the repo, the name of the chart ecc ecc...
+* providers.tf: the terraform providers mainly for helm
+* main.tf: The main script which is installing the RabbitMQ cluster in the K8s clusters
+
+
+## Limitations
+
+I would have liked to make the script more extensible, like write the names of the K8s clusters as well as associate them with some RabbitMQ properties (username, password, ports to use ecc ecc...) in a configuration file and allow the script to loop over the K8s scripts and do  the installation based on the RabbitMQ configurations
+But because I don't know well Terraform or I hit some limitations I was taking too much time on this implementation and to be on the 3hours frame I decided to leave it for the moment.
+
+## How to test
+
+on variables.tf we can override some parameteres (for example the namespace of the K8s cluster where the installation will take place like rabbitmq)
+
+on providers.tf there are the two helm provideres:
+
+'''
+provider "helm" {
+  alias = "cluster_1"
+  kubernetes {
+    config_path    = "~/.kube/config"
+    config_context = "kind-rabbitmq-1"
+  }
+}
+
+provider "helm" {
+  alias = "cluster_2"
+  kubernetes {
+    config_path    = "~/.kube/config"
+    config_context = "kind-rabbitmq-2"
+  }
+}
+'''
+you need to modify the config_name specified in your ~/.kube/config
+
+then you can:
+
+'''
+terraform init
+terraform plan
+terraform apply
+'''
+
+you can connect to a cluster and see if everything is up and running:
+
+'''
+kubectl get all -n rabbitmq
+'''
+
+
+## Extension
+As every project if useful to have github action that on every PR and push on main run a deployment (for example on a kind cluster created inside a github vm) to validate for modifications. 
+
 
 
 
