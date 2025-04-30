@@ -52,10 +52,14 @@ The terraform script is composed by different files:
 * main.tf: The main script which is installing the RabbitMQ cluster in the K8s clusters
 
 
-## Limitations
+## Limitations and Improvements
 
 I would have liked to make the script more extensible, like write the names of the K8s clusters as well as associate them with some RabbitMQ properties (username, password, ports to use ecc ecc...) in a configuration file and allow the script to loop over the K8s scripts and do  the installation based on the RabbitMQ configurations
 But because I don't know well Terraform or I hit some limitations I was taking too much time on this implementation and to be on the 3hours frame I decided to leave it for the moment.
+As every project if useful to have github action that on every PR and push on main run a deployment (for example on a kind cluster created inside a github vm) to validate for modifications. 
+
+It is also better to develop RabbitMQ clusters on K8s using the cluster operator: https://github.com/bitnami/charts/tree/main/bitnami/rabbitmq-cluster-operator
+In this case the terraform script needs to take in consideration the installation of the operator and then of the RabbitMQ clusters
 
 ## How to test
 
@@ -96,9 +100,18 @@ you can connect to a cluster and see if everything is up and running:
 kubectl get all -n rabbitmq
 ```
 
+you can then expose the rabbitmq servie:
 
-## Extension
-As every project if useful to have github action that on every PR and push on main run a deployment (for example on a kind cluster created inside a github vm) to validate for modifications. 
+```
+kubectl port-forward -n rabbitmq-system service/rabbitmq 15672:15672 
+```
+
+and connect to the UI withing the web browser:
+
+```
+http://localhost:15672/
+```
+
 
 
 
