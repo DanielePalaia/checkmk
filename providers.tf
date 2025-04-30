@@ -20,7 +20,7 @@ provider "helm" {
   alias = "cluster_1"
   kubernetes {
     config_path    = "~/.kube/config"
-    config_context = "kind-kind-rabbitmq-1"
+    config_context = "kind-rabbitmq-1"
   }
 }
 
@@ -28,6 +28,6 @@ provider "helm" {
   alias = "cluster_2"
   kubernetes {
     config_path    = "~/.kube/config"
-    config_context = "kind-kind-rabbitmq-2"
+    config_context = "kind-rabbitmq-2"
   }
 }
