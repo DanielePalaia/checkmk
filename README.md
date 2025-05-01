@@ -52,11 +52,11 @@ The terraform script is composed by different files:
 * variables.tf: where there are some parameters we can modify to install the RabbitMQ clusters on a K8s cluster like the image, the repo, the name of the chart ecc ecc...
 * providers.tf: the terraform providers mainly for helm
 * main.tf: The main script which is installing the RabbitMQ cluster in the K8s clusters
-* output.tf: Some output
+* output.tf: Some outputs
 
 ## Limitations and Improvements
 
-I would have liked to make the script to be more extensible, like writing the names of the K8s clusters as well as associate them with some RabbitMQ properties (username, password, ports to use ecc ecc...) in a configuration file and allow the script to loop over the K8s clusters and do the installation based on the RabbitMQ configurations
+I would have liked to make the script to be more extensible like: writing the names of the K8s clusters as well as associate them with some RabbitMQ properties (username, password, ports to use ecc ecc...) in a configuration file and allow the script to loop over the K8s clusters and do the installation based on the RabbitMQ configurations
 But because I don't know well Terraform or I hit some limitations I was taking too much time on this implementation and to be on the 3hours frame I decided to leave it for the moment.
 As every project if useful also to have github action that on every PR and push on main run a deployment (for example on a kind cluster created inside a github vm) to validate for modifications. 
 
@@ -68,7 +68,7 @@ In this case the terraform script needs to take in consideration the installatio
 
 ## How to test
 
-on variables.tf we can override some parameteres (for example the namespace of the K8s cluster where the installation will take place like rabbitmq).
+on variables.tf we can override some parameteres (for example the namespace of the K8s cluster where the installation will take place like rabbitmq). We can also specify some specific parameters for the clusters.
 
 on providers.tf there are the two helm provideres:
 
@@ -105,7 +105,7 @@ you can connect to a cluster and see if everything is up and running:
 kubectl get all -n rabbitmq
 ```
 
-you can then connect to the RabbitMQ UI using the port 31672 (the same one used during the kind cluster creation and specified in the RabbitMQ variables.tf) from localhost
+you can then connect to the RabbitMQ UI using the port 31671/31672 (the same one used during the kind cluster creation and specified in the RabbitMQ variables.tf) from localhost
 
 ```
 http://localhost:31671/
