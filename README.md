@@ -16,26 +16,28 @@ https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
 - we are interested in how you structure and document your POC
 
 ## Infrastructure used
-We could use a set of K8s clusters deployed on the Cloud like GKE to have automatic access to a Cloud Load Balancer to be able to have
-autmatic access from the internet with an external-ip but given the simple usage of the POC 
-we can just use a couple of local K8s clusters developed with Kind and expose the deployed service to be accessed locally.
+We could use a set of K8s clusters deployed on the Cloud like GKE to have a Cloud LoadBalancer automatically provisioned for us from the Cloud provider
+to be able to have automatic access from the internet with an external-ip but given the simple usage of the POC I think
+we can just use a couple of local K8s clusters deployed with Kind and expose the deployed service as NodePort and access it from localhost.
 
 We can create a couple of K8s clusters locally with Kind in this way:
 
 ```
-kind create cluster --name rabbitmq-1
-kind create cluster --name rabbitmq-2
+ kind create cluster --config ./config/kind-config.yaml --name rabbitmq-1
+ kind create cluster --config ./config/kind-config-2.yaml --name rabbitmq-2
 ```
+
+kind-config.yaml is just used to add an externalPortMapping to the kind clusters for port 31671/31672 that will be used to map RabbitMQ 15672 as NodePort
 
 We could also simulate a LoadBalancer using tools like MetaLB: https://metallb.io/ or another similar solution and configure it with Kind to have an external-ip
 but I'll leave it for this POC.
 
 ## Chart used
 
-Bitnami offers a lot of Open Source helm charts offered in a OCI format.
-I have chosen to use RabbitMQ.
+Bitnami offers a lot of Open Source helm charts released in a OCI format.
+I have chosen to use RabbitMQ :)
 
-There are two charts of RabbitMQ offered:
+There are two charts of RabbitMQ offered by Bitnami:
 * RabbitMQ cluster operator: https://github.com/bitnami/charts/tree/main/bitnami/rabbitmq-cluster-operator
 * RabbitMQ: https://github.com/bitnami/charts/tree/main/bitnami/rabbitmq
 
@@ -50,13 +52,13 @@ The terraform script is composed by different files:
 * variables.tf: where there are some parameters we can modify to install the RabbitMQ clusters on a K8s cluster like the image, the repo, the name of the chart ecc ecc...
 * providers.tf: the terraform providers mainly for helm
 * main.tf: The main script which is installing the RabbitMQ cluster in the K8s clusters
-
+* output.tf: Some output
 
 ## Limitations and Improvements
 
-I would have liked to make the script more extensible, like write the names of the K8s clusters as well as associate them with some RabbitMQ properties (username, password, ports to use ecc ecc...) in a configuration file and allow the script to loop over the K8s scripts and do  the installation based on the RabbitMQ configurations
+I would have liked to make the script to be more extensible, like writing the names of the K8s clusters as well as associate them with some RabbitMQ properties (username, password, ports to use ecc ecc...) in a configuration file and allow the script to loop over the K8s clusters and do the installation based on the RabbitMQ configurations
 But because I don't know well Terraform or I hit some limitations I was taking too much time on this implementation and to be on the 3hours frame I decided to leave it for the moment.
-As every project if useful to have github action that on every PR and push on main run a deployment (for example on a kind cluster created inside a github vm) to validate for modifications. 
+As every project if useful also to have github action that on every PR and push on main run a deployment (for example on a kind cluster created inside a github vm) to validate for modifications. 
 
 It is also better to develop RabbitMQ clusters on K8s using the cluster operator: 
 
@@ -66,7 +68,7 @@ In this case the terraform script needs to take in consideration the installatio
 
 ## How to test
 
-on variables.tf we can override some parameteres (for example the namespace of the K8s cluster where the installation will take place like rabbitmq)
+on variables.tf we can override some parameteres (for example the namespace of the K8s cluster where the installation will take place like rabbitmq).
 
 on providers.tf there are the two helm provideres:
 
@@ -103,16 +105,11 @@ you can connect to a cluster and see if everything is up and running:
 kubectl get all -n rabbitmq
 ```
 
-you can then expose the rabbitmq servie:
+you can then connect to the RabbitMQ UI using the port 31672 (the same one used during the kind cluster creation and specified in the RabbitMQ variables.tf) from localhost
 
 ```
-kubectl port-forward -n rabbitmq-system service/rabbitmq 15672:15672 
-```
-
-and connect to the UI withing the web browser:
-
-```
-http://localhost:15672/
+http://localhost:31671/
+http://localhost:31672/
 ```
 
 

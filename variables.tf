@@ -18,17 +18,21 @@ locals {
       "auth.username" = "admin"
       "auth.password" = "password123"
       "service.type"  = "NodePort"
+      "service.ports.manager" = "15672"
     }
   }
   
   # Cluster-specific configs
   cluster_1_config = {
     sets = {
-      "service.ports.manager" = "15672"  # RabbitMQ UI port
+         "service.nodePorts.manager" = "31671"
     }
+  
   }
   
   cluster_2_config = {
-    sets = {}  # No additional settings for cluster 2
+    sets = {
+         "service.nodePorts.manager" = "31672"
+    }  # No additional settings for cluster 2
   }
 }

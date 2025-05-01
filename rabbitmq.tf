@@ -50,7 +50,7 @@ resource "helm_release" "rabbitmq-cluster-2" {
   
   # Apply cluster-specific sets
   dynamic "set" {
-    for_each = local.cluster_1_config.sets
+    for_each = local.cluster_2_config.sets
     content {
       name  = set.key
       value = set.value
