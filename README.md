@@ -57,7 +57,7 @@ The terraform script is composed by different files:
 ## Limitations and Improvements
 
 I would have liked to make the script to be more extensible like: writing the names of the K8s clusters as well as associate them with some RabbitMQ properties (username, password, ports to use ecc ecc...) based on some environments (PRD, DEV ecc...) in a configuration file and allow the script to loop over the K8s clusters and do the installation based on the RabbitMQ configurations specified
-But because I don't know well Terraform or I hit some limitations I was taking too much time on this implementation and to be on the 3hours frame I decided to leave it for the moment.
+But I was taking too much time on this implementation and to be on the 3hours frame I decided to leave it for the moment.
 As every project if useful also to have github action that on every PR and push on main run a deployment (for example on a kind cluster created inside a github vm) to validate for modifications. 
 
 It is also better to develop RabbitMQ clusters on K8s using the cluster operator: 
