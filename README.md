@@ -2,7 +2,7 @@
 
 Demo - POC project for Checkmk interview
 
-## Prerequisites
+## Exercise goal
 As a Cloud/Platform Engineer you want to write a small POC for your team in which you
 showcase how you can deploy a Helm chart using Terraform in a multi-cluster setup. You
 also want to showcase that you can connect from the internet to one of the services exposed
@@ -15,7 +15,7 @@ Specs and further information:
 https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
 - we are interested in how you structure and document your POC
 
-## Infrastructure used
+## Infrastructure
 We could use a set of K8s clusters deployed on the Cloud like GKE to have a Cloud LoadBalancer automatically provisioned for us from the Cloud provider
 to be able to have automatic access from the internet with an external-ip but given the simple usage of the POC I think
 we can just use a couple of local K8s clusters deployed with Kind and expose the deployed service as NodePort and access it from localhost.
@@ -56,7 +56,7 @@ The terraform script is composed by different files:
 
 ## Limitations and Improvements
 
-I would have liked to make the script to be more extensible like: writing the names of the K8s clusters as well as associate them with some RabbitMQ properties (username, password, ports to use ecc ecc...) in a configuration file and allow the script to loop over the K8s clusters and do the installation based on the RabbitMQ configurations
+I would have liked to make the script to be more extensible like: writing the names of the K8s clusters as well as associate them with some RabbitMQ properties (username, password, ports to use ecc ecc...) based on some environments (PRD, DEV ecc...) in a configuration file and allow the script to loop over the K8s clusters and do the installation based on the RabbitMQ configurations specified
 But because I don't know well Terraform or I hit some limitations I was taking too much time on this implementation and to be on the 3hours frame I decided to leave it for the moment.
 As every project if useful also to have github action that on every PR and push on main run a deployment (for example on a kind cluster created inside a github vm) to validate for modifications. 
 
